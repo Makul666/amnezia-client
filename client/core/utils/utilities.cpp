@@ -232,7 +232,7 @@ bool Utils::killProcessByName(const QString &name)
 
             if (exeFile.compare(name, Qt::CaseInsensitive) == 0) {
                 HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, pe32.th32ProcessID);
-                if (hProcess != NULL) {
+                if (hProcess != nullptr) {
                     if (TerminateProcess(hProcess, 0)) {
                         success = true;
                     } else {

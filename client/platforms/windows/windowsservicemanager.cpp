@@ -27,14 +27,14 @@ std::unique_ptr<WindowsServiceManager> WindowsServiceManager::open(
     const QString serviceName) {
   LPCWSTR service = (const wchar_t*)serviceName.utf16();
 
-  DWORD err = NULL;
+  DWORD err = nullptr;
   auto scm_rights = SC_MANAGER_CONNECT | SC_MANAGER_ENUMERATE_SERVICE |
                     SC_MANAGER_QUERY_LOCK_STATUS | STANDARD_RIGHTS_READ;
   auto manager = OpenSCManager(NULL,  // local computer
                                NULL,  // servicesActive database
                                scm_rights);
   err = GetLastError();
-  if (err != NULL) {
+  if (err != nullptr) {
     logger.error() << " OpenSCManager failed code: " << err;
     return {};
   }
@@ -47,7 +47,7 @@ std::unique_ptr<WindowsServiceManager> WindowsServiceManager::open(
                   service,  // name of service
                   (GENERIC_READ | SERVICE_START | SERVICE_STOP));
   err = GetLastError();
-  if (err != NULL) {
+  if (err != nullptr) {
     CloseServiceHandle(manager);
     WindowsUtils::windowsLog("OpenService failed");
     return {};
@@ -58,10 +58,10 @@ std::unique_ptr<WindowsServiceManager> WindowsServiceManager::open(
 }
 
 WindowsServiceManager::~WindowsServiceManager() {
-  if (m_service != NULL) {
+  if (m_service != nullptr) {
     CloseServiceHandle(m_service);
   }
-  if (m_serviceManager != NULL) {
+  if (m_serviceManager != nullptr) {
     CloseServiceHandle(m_serviceManager);
   }
 }

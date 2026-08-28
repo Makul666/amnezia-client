@@ -1,45 +1,67 @@
 ```
+# Compiled and build artifacts
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
 # Dependencies
 node_modules/
-.venv/
 venv/
+.venv/
 __pycache__/
 .mypy_cache/
 .pytest_cache/
 target/
 .gradle/
 
-# Build artifacts
-dist/
-build/
-*.o
-*.obj
-*.out
-
-# Editors
-.vscode/
-.idea/
-*.swp
-*.swo
-
 # Logs and temp files
 *.log
 *.tmp
+*.swp
 
 # Environment
 .env
 .env.local
 *.env.*
 
-# System files
-.DS_Store
-Thumbs.db
+# Editors
+.vscode/
+.idea/
 
 # Coverage
 coverage/
 htmlcov/
 .coverage
 
-# Mac specific
-client/macos/gobridge/apple/
+# Build directories
+build/
+dist/
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```
