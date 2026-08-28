@@ -1,43 +1,45 @@
-```gitignore
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
+```
 # Dependencies
 node_modules/
-venv/
 .venv/
-.env
-.env.local
-*.env.*
+venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+target/
+.gradle/
 
 # Build artifacts
 dist/
 build/
-target/
 *.o
 *.obj
-*.so
-*.dll
-*.exe
-
-# Logs and temporary files
-*.log
-*.tmp
-*.swp
+*.out
 
 # Editors
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# Coverage
-.coverage
-coverage/
-htmlcov/
+# Logs and temp files
+*.log
+*.tmp
 
-# OS specific
+# Environment
+.env
+.env.local
+*.env.*
+
+# System files
 .DS_Store
 Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Mac specific
+client/macos/gobridge/apple/
 ```
