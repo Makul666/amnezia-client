@@ -6,6 +6,9 @@
 
 #include <core/utils/networkUtilities.h>
 
+#include <vector>
+#include <string>
+
 RouterMac &RouterMac::Instance()
 {
     static RouterMac s;
@@ -37,21 +40,20 @@ bool RouterMac::routeAdd(const QString &ipWithSubnet, const QString &gw)
     QStringList parts = cmd.split(" ");
 
     int argc = parts.size();
-    char **argv = new char*[argc];
+    std::vector<std::string> argStrings;
+    argStrings.reserve(argc);
+    std::vector<char*> argv;
+    argv.reserve(argc + 1);
 
     for (int i = 0; i < argc; i++) {
-        argv[i] = new char[parts.at(i).toStdString().length() + 1];
-        strcpy(argv[i], parts.at(i).toStdString().c_str());
+        argStrings.push_back(parts.at(i).toStdString());
+        argv.push_back(const_cast<char*>(argStrings.back().c_str()));
     }
+    argv.push_back(nullptr);
 
-    // TODO refactor
-    mainRouteIface(argc, argv);
+    mainRouteIface(argc, argv.data());
     m_addedRoutes.append({ipWithSubnet, gw});
 
-    for (int i = 0; i < argc; i++) {
-        delete [] argv[i];
-    }
-    delete[] argv;
     return true;
 }
 
@@ -105,19 +107,19 @@ bool RouterMac::routeDelete(const QString &ipWithSubnet, const QString &gw)
     QStringList parts = cmd.split(" ");
 
     int argc = parts.size();
-    char **argv = new char*[argc];
+    std::vector<std::string> argStrings;
+    argStrings.reserve(argc);
+    std::vector<char*> argv;
+    argv.reserve(argc + 1);
 
     for (int i = 0; i < argc; i++) {
-        argv[i] = new char[parts.at(i).toStdString().length() + 1];
-        strcpy(argv[i], parts.at(i).toStdString().c_str());
+        argStrings.push_back(parts.at(i).toStdString());
+        argv.push_back(const_cast<char*>(argStrings.back().c_str()));
     }
+    argv.push_back(nullptr);
 
-    mainRouteIface(argc, argv);
+    mainRouteIface(argc, argv.data());
 
-    for (int i = 0; i < argc; i++) {
-        delete [] argv[i];
-    }
-    delete[] argv;
     return true;
 }
 
@@ -169,35 +171,27 @@ bool RouterMac::routeAddXray(const QString& ifname, const QString& gateway)
         return false;
     }
 
-    QString cmd = QString("route add -net 0.0.0.0/1 %1 -ifscope %2").arg(gateway).arg(ifname);
-    QStringList parts = cmd.split(" ");
+    auto executeRouteCommand = [&](const QString& cmd) {
+        QStringList parts = cmd.split(" ");
+        int argc = parts.size();
+        std::vector<std::string> argStrings;
+        argStrings.reserve(argc);
+        std::vector<char*> argv;
+        argv.reserve(argc + 1);
 
-    int argc = parts.size();
-    char **argv = new char*[argc];
-    for (int i = 0; i < argc; i++) {
-        argv[i] = new char[parts.at(i).toStdString().length() + 1];
-        strcpy(argv[i], parts.at(i).toStdString().c_str());
-    }
-    mainRouteIface(argc, argv);
-    for (int i = 0; i < argc; i++) {
-        delete [] argv[i];
-    }
-    delete[] argv;
+        for (int i = 0; i < argc; i++) {
+            argStrings.push_back(parts.at(i).toStdString());
+            argv.push_back(const_cast<char*>(argStrings.back().c_str()));
+        }
+        argv.push_back(nullptr);
+        mainRouteIface(argc, argv.data());
+    };
+
+    QString cmd = QString("route add -net 0.0.0.0/1 %1 -ifscope %2").arg(gateway).arg(ifname);
+    executeRouteCommand(cmd);
 
     cmd = QString("route add -net 128.0.0.0/1 %1 -ifscope %2").arg(gateway).arg(ifname);
-    parts = cmd.split(" ");
-
-    argc = parts.size();
-    argv = new char*[argc];
-    for (int i = 0; i < argc; i++) {
-        argv[i] = new char[parts.at(i).toStdString().length() + 1];
-        strcpy(argv[i], parts.at(i).toStdString().c_str());
-    }
-    mainRouteIface(argc, argv);
-    for (int i = 0; i < argc; i++) {
-        delete [] argv[i];
-    }
-    delete[] argv;
+    executeRouteCommand(cmd);
 
     qDebug().noquote() << "Installed xray routes via" << gateway << "on" << ifname;
     return true;
@@ -209,44 +203,36 @@ bool RouterMac::routeDeleteXray(const QString& ifname, const QString& gateway)
         return false;
     }
 
+    auto executeRouteCommand = [&](const QString& cmd) {
+        QStringList parts = cmd.split(" ");
+        int argc = parts.size();
+        std::vector<std::string> argStrings;
+        argStrings.reserve(argc);
+        std::vector<char*> argv;
+        argv.reserve(argc + 1);
+
+        for (int i = 0; i < argc; i++) {
+            argStrings.push_back(parts.at(i).toStdString());
+            argv.push_back(const_cast<char*>(argStrings.back().c_str()));
+        }
+        argv.push_back(nullptr);
+        mainRouteIface(argc, argv.data());
+    };
+
     QString cmd;
     if (!gateway.isEmpty()) {
         cmd = QString("route delete -net 0.0.0.0/1 %1 -ifscope %2").arg(gateway).arg(ifname);
     } else {
         cmd = QString("route delete -net 0.0.0.0/1 -ifscope %1").arg(ifname);
     }
-    QStringList parts = cmd.split(" ");
-
-    int argc = parts.size();
-    char **argv = new char*[argc];
-    for (int i = 0; i < argc; i++) {
-        argv[i] = new char[parts.at(i).toStdString().length() + 1];
-        strcpy(argv[i], parts.at(i).toStdString().c_str());
-    }
-    mainRouteIface(argc, argv);
-    for (int i = 0; i < argc; i++) {
-        delete [] argv[i];
-    }
-    delete[] argv;
+    executeRouteCommand(cmd);
 
     if (!gateway.isEmpty()) {
         cmd = QString("route delete -net 128.0.0.0/1 %1 -ifscope %2").arg(gateway).arg(ifname);
     } else {
         cmd = QString("route delete -net 128.0.0.0/1 -ifscope %1").arg(ifname);
     }
-    parts = cmd.split(" ");
-
-    argc = parts.size();
-    argv = new char*[argc];
-    for (int i = 0; i < argc; i++) {
-        argv[i] = new char[parts.at(i).toStdString().length() + 1];
-        strcpy(argv[i], parts.at(i).toStdString().c_str());
-    }
-    mainRouteIface(argc, argv);
-    for (int i = 0; i < argc; i++) {
-        delete [] argv[i];
-    }
-    delete[] argv;
+    executeRouteCommand(cmd);
 
     qDebug().noquote() << "Removed xray routes on" << ifname;
     return true;

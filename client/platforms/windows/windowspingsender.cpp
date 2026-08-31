@@ -112,7 +112,7 @@ WindowsPingSender::~WindowsPingSender() {
   // Closing the ICMP handle can hang if there are lost ping replies. Moving
   // the cleanup into a separate thread avoids deadlocking the application.
   HANDLE h = CreateThread(NULL, 0, icmpCleanupHelper, m_private, 0, NULL);
-  if (h == NULL) {
+  if (h == nullptr) {
     icmpCleanupHelper(m_private);
   } else {
     CloseHandle(h);

@@ -9,8 +9,8 @@
 
 #include <core/utils/networkUtilities.h>
 
-LONG (NTAPI * NtSuspendProcess)(HANDLE ProcessHandle) = NULL;
-LONG (NTAPI * NtResumeProcess)(HANDLE ProcessHandle)  = NULL;
+LONG (NTAPI * NtSuspendProcess)(HANDLE ProcessHandle) = nullptr;
+LONG (NTAPI * NtResumeProcess)(HANDLE ProcessHandle)  = nullptr;
 
 #define STATUS_SUCCESS ((NTSTATUS)0x00000000L)
 
@@ -44,7 +44,7 @@ int RouterWin::routeAddList(const QString &gw, const QStringList &ips)
         return 0;
     }
 
-    PMIB_IPFORWARDTABLE pIpForwardTable = NULL;
+    PMIB_IPFORWARDTABLE pIpForwardTable = nullptr;
     DWORD dwSize = 0;
     BOOL bOrder = FALSE;
     DWORD dwStatus = 0;
@@ -156,7 +156,7 @@ bool RouterWin::clearSavedRoutes()
     qDebug() << "RouterWin::clearSavedRoutes forward rows size:" << m_ipForwardRows.size();
 
     // Declare and initialize variables
-    PMIB_IPFORWARDTABLE pIpForwardTable = NULL;
+    PMIB_IPFORWARDTABLE pIpForwardTable = nullptr;
     DWORD dwSize = 0;
     BOOL bOrder = FALSE;
     DWORD dwStatus = 0;
@@ -211,7 +211,7 @@ int RouterWin::routeDeleteList(const QString &gw, const QStringList &ips)
 //    qDebug().noquote() << QString("ROUTE DELETE List: IPs:\n%1")
 //                          .arg(ips.join("\n"));
 
-    PMIB_IPFORWARDTABLE pIpForwardTable = NULL;
+    PMIB_IPFORWARDTABLE pIpForwardTable = nullptr;
     DWORD dwSize = 0;
     BOOL bOrder = FALSE;
     DWORD dwStatus = 0;
@@ -401,7 +401,7 @@ void RouterWin::suspendWcmSvc(bool suspend)
 
 DWORD RouterWin::GetServicePid(LPCWSTR serviceName)
 {
-    const auto hScm = OpenSCManagerW(nullptr, nullptr, NULL);
+    const auto hScm = OpenSCManagerW(nullptr, nullptr, nullptr);
     const auto hSc = OpenServiceW(hScm, serviceName, SERVICE_QUERY_STATUS);
 
     SERVICE_STATUS_PROCESS ssp = {};
@@ -466,19 +466,19 @@ BOOL RouterWin::ListProcessThreads( DWORD dwOwnerPID )
 
 BOOL RouterWin::EnableDebugPrivilege(VOID)
 {
-  HANDLE           hToken = NULL;
+  HANDLE           hToken = nullptr;
   TOKEN_PRIVILEGES priv;
 
   if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken))
     return FALSE;
 
-  if (!LookupPrivilegeValueW(NULL, SE_DEBUG_NAME, &priv.Privileges[0].Luid))
+  if (!LookupPrivilegeValueW(nullptr, SE_DEBUG_NAME, &priv.Privileges[0].Luid))
     return FALSE;
 
   priv.PrivilegeCount           = 1;
   priv.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
 
-  return AdjustTokenPrivileges(hToken, FALSE, &priv, sizeof(priv), NULL, NULL);
+  return AdjustTokenPrivileges(hToken, FALSE, &priv, sizeof(priv), nullptr, nullptr);
 }
 
 BOOL RouterWin::InitNtFunctions(VOID)
@@ -486,17 +486,17 @@ BOOL RouterWin::InitNtFunctions(VOID)
   HMODULE hModule;
 
   hModule = GetModuleHandleW(L"ntdll.dll");
-  if (hModule == NULL)
+  if (hModule == nullptr)
     return FALSE;
 
   //NtSuspendProcess = (decltype(NtSuspendProcess))GetProcAddress(hModule, "NtSuspendThread");
   NtSuspendProcess = (decltype(NtSuspendProcess))GetProcAddress(hModule, "NtSuspendProcess");
-  if (NtSuspendProcess == NULL)
+  if (NtSuspendProcess == nullptr)
     return FALSE;
 
   //NtResumeProcess = (decltype(NtResumeProcess))GetProcAddress(hModule, "NtResumeThread");
   NtResumeProcess = (decltype(NtResumeProcess))GetProcAddress(hModule, "NtResumeProcess");
-  if (NtResumeProcess == NULL)
+  if (NtResumeProcess == nullptr)
     return FALSE;
 
   return TRUE;
@@ -505,7 +505,7 @@ BOOL RouterWin::InitNtFunctions(VOID)
 BOOL RouterWin::SuspendProcess(BOOL fSuspend, DWORD dwProcessId)
 {
     HANDLE pHandle = OpenProcess(PROCESS_SUSPEND_RESUME, FALSE, dwProcessId);
-    if (pHandle == NULL) return false;
+    if (pHandle == nullptr) return false;
 
     bool ok = ((fSuspend ? NtSuspendProcess : NtResumeProcess)(pHandle) == STATUS_SUCCESS);
     CloseHandle(pHandle);

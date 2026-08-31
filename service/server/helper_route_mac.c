@@ -551,15 +551,15 @@ netname(sa)
 		       if (cp != NULL)
 			       strlcpy(line, cp, sizeof(line));
 		       else if ((in.s_addr & 0xffffff) == 0)
-			       (void) sprintf(line, "%u", C(in.s_addr >> 24));
+			       (void) snprintf(line, sizeof(line), "%u", C(in.s_addr >> 24));
 		       else if ((in.s_addr & 0xffff) == 0)
-			       (void) sprintf(line, "%u.%u", C(in.s_addr >> 24),
+			       (void) snprintf(line, sizeof(line), "%u.%u", C(in.s_addr >> 24),
 					       C(in.s_addr >> 16));
 		       else if ((in.s_addr & 0xff) == 0)
-			       (void) sprintf(line, "%u.%u.%u", C(in.s_addr >> 24),
+			       (void) snprintf(line, sizeof(line), "%u.%u.%u", C(in.s_addr >> 24),
 					       C(in.s_addr >> 16), C(in.s_addr >> 8));
 		       else
-			       (void) sprintf(line, "%u.%u.%u.%u", C(in.s_addr >> 24),
+			       (void) snprintf(line, sizeof(line), "%u.%u.%u.%u", C(in.s_addr >> 24),
 					       C(in.s_addr >> 16), C(in.s_addr >> 8),
 					       C(in.s_addr));
 #undef C

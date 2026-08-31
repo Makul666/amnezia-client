@@ -66,15 +66,15 @@ QString LinuxDependencies::findCgroupPath(const QString& type) {
   char buf[PATH_MAX];
 
   FILE* fp = fopen("/etc/mtab", "r");
-  if (fp == NULL) {
+  if (fp == nullptr) {
     return QString();
   }
 
-  while (getmntent_r(fp, &entry, buf, sizeof(buf)) != NULL) {
+  while (getmntent_r(fp, &entry, buf, sizeof(buf)) != nullptr) {
     if (strcmp(entry.mnt_type, "cgroup") != 0) {
       continue;
     }
-    if (hasmntopt(&entry, type.toLocal8Bit().constData()) != NULL) {
+    if (hasmntopt(&entry, type.toLocal8Bit().constData()) != nullptr) {
       fclose(fp);
       return QString(entry.mnt_dir);
     }
@@ -90,11 +90,11 @@ QString LinuxDependencies::findCgroup2Path() {
   char buf[PATH_MAX];
 
   FILE* fp = fopen("/etc/mtab", "r");
-  if (fp == NULL) {
+  if (fp == nullptr) {
     return QString();
   }
 
-  while (getmntent_r(fp, &entry, buf, sizeof(buf)) != NULL) {
+  while (getmntent_r(fp, &entry, buf, sizeof(buf)) != nullptr) {
     if (strcmp(entry.mnt_type, "cgroup2") != 0) {
       continue;
     }
